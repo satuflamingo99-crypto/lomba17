@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bagan Lomba - System Cup (Sistem Gugur)</title>
+<style>
+  *{box-sizing:border-box}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#f5f2e8;color:#111;margin:0}
+  header{padding:18px 24px 4px;text-align:center}
+  h1{margin:0;font-size:24px}
+  .sub{margin:6px 0 0;color:#555;font-size:13px}
+  .app{display:flex;gap:16px;padding:16px;align-items:flex-start;flex-wrap:wrap}
+  .panel{background:#fff;border:2px solid #111;border-radius:12px;padding:14px;width:270px;box-shadow:4px 4px 0 #d9d2bd;flex-shrink:0}
+  .panel h2{margin:0 0 10px;font-size:16px}
+  .teamRow{display:flex;align-items:center;gap:6px;border:1.5px solid #111;border-radius:8px;padding:6px 8px;margin-bottom:6px;background:#fffbe6}
+  .teamRow .nm{flex:1;font-weight:700}
+  .teamRow .seed{font-size:10px;background:#f3df9a;border:1px solid #111;border-radius:6px;padding:1px 5px}
+  .teamRow button{padding:2px 7px;font-size:12px}
+  .addrow{display:flex;gap:6px;margin-top:8px}
+  input{flex:1;border:1.5px solid #111;border-radius:8px;padding:6px 8px;font:inherit;min-width:0}
+  button{cursor:pointer;border:1.5px solid #111;background:#ffe08a;border-radius:8px;padding:6px 10px;font-weight:600;font:inherit;font-weight:700}
+  button:hover{filter:brightness(1.06)}
+  .btnrow{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+  .hint{font-size:11.5px;color:#666;margin-top:10px;line-height:1.5}
+  .board-wrap{flex:1;overflow:auto;min-width:300px}
+  #board{display:flex;gap:56px;padding:20px 30px 50px;min-width:max-content;position:relative}
+  #lines{position:absolute;top:0;left:0;pointer-events:none}
+  .col{display:flex;flex-direction:column;gap:26px;justify-content:space-around;min-width:215px}
+  .colTitle{background:#f3df9a;border:2px solid #111;text-align:center;font-weight:800;padding:8px;border-radius:6px}
+  .match{background:#fff;border:2px solid #111;border-radius:10px;box-shadow:3px 3px 0 #d9d2bd;overflow:hidden}
+  .mTitle{font-size:11px;font-weight:800;text-align:center;background:#eee;border-bottom:1.5px solid #111;padding:4px}
+  .slot{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;padding:9px 10px;background:#fff;border:none;border-top:1.5px solid #111;font:inherit;font-weight:700;cursor:default}
+  .slot:first-of-type{border-top:none}
+  .slot.ready{cursor:pointer}
+  .slot.ready:hover{background:#fff7d1}
+  .slot.win{background:#d9f2d9;color:#0a7a3a}
+  .slot.lose{color:#b33;text-decoration:line-through}
+  .slot .x{color:#c22;font-weight:900;text-decoration:none}
+  .tbd{color:#999;font-style:italic;font-weight:500}
+  .bye{border:2px dashed #2a7d2a;background:#e6f4e6;color:#1c5c1c;border-radius:10px;padding:12px;text-align:center;font-weight:800;font-size:12px}
+  .champ{background:linear-gradient(135deg,#f7d774,#c9971c);border:2px solid #111;border-radius:12px;padding:18px;text-align:center;font-weight:900;min-height:90px;display:flex;flex-direction:column;justify-content:center}
+  .foot{text-align:center;font-weight:800;padding:0 0 26px;letter-spacing:.5px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🏆 BAGAN LOMBA – SYSTEM CUP (SISTEM GUGUR)</h1>
+  <p class="sub">Klik nama tim di dalam match untuk memilih pemenang • Kalah = gugur (❌) • Bye hanya 1× di semifinal sisi tanpa unggulan</p>
+</header>
+
+<div class="app">
+  <aside class="panel">
+    <h2>👥 Manajemen Tim</h2>
+    <div id="teamList"></div>
+    <div class="addrow">
+      <input id="newTeam" placeholder="Nama tim baru" maxlength="20">
+      <button id="addBtn">+ Tambah</button>
+    </div>
+    <div class="btnrow">
+      <button id="shuffleBtn">🎲 Acak</button>
+      <button id="resetBtn">♻ Reset Hasil</button>
+      <button id="defaultBtn">⟲ Default</button>
+    </div>
+    <p class="hint">⬆ ⬇ pindah urutan • ✕ hapus tim<br>
+    ★ Tim #1 = unggulan → langsung semifinal.<br>
+    Bye hanya 1×: di semifinal, sisi bagan yang <b>tidak ada Kucing</b> → winner Match 2 langsung ke Final.</p>
+  </aside>
+
+  <main class="board-wrap">
+    <div id="board"></div>
+  </main>
+</div>
+<p class="foot">KALAH = GUGUR (ELIMINASI)</p>
+
+<script>
+const DEF = ['Kucing','Kambing','Panda','Singa','Semut'];
+let teams = [...DEF];
+let winners = {};           // matchId -> nama tim pemenang
+let bracket = null;
+const $ = s => document.querySelector(s);
+const esc = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function buildBracket(){
+  const t = teams.slice(0,8), n = t.length;
+  const cols = [], M = {}, links = []; let finalId = 'F';
+  const addM = (id,title,r,a,b) => { M[id]={id,title,a,b}; (cols[r]=cols[r]||[]).push({kind:'match',id}); };
+  const T = x => ({team:x}), W = (x,via) => ({from:x,via});
+
+  if(n===2){ addM('F','FINAL',0,T(t[0]),T(t[1])); }
+  else if(n===3){ addM('M1','MATCH 1',0,T(t[1]),T(t[2])); addM('F','FINAL',1,T(t[0]),W('M1')); }
+  else if(n===4){ addM('S1','MATCH 1',0,T(t[0]),T(t[1])); addM('S2','MATCH 2',0,T(t[2]),T(t[3])); addM('F','FINAL',1,W('S1'),W('S2')); }
+  else if(n===5){
+    addM('M1','MATCH 1',0,T(t[1]),T(t[2]));
+    addM('M2','MATCH 2',0,T(t[3]),T(t[4]));
+    addM('S1','MATCH 3 (SEMIFINAL)',1,T(t[0]),W('M1'));
+    (cols[1]=cols[1]||[]).push({kind:'bye',id:'BYE',text:'BYE – WINNER MATCH 2 LANGSUNG KE FINAL'});
+    addM('F','MATCH 4 (FINAL)',2,W('S1'),W('M2','BYE'));
+  }
+  else if(n===6){ addM('M1','MATCH 1',0,T(t[2]),T(t[3])); addM('M2','MATCH 2',0,T(t[4]),T(t[5]));
+    addM('S1','MATCH 3',1,T(t[0]),W('M1')); addM('S2','MATCH 4',1,T(t[1]),W('M2')); addM('F','MATCH 5 (FINAL)',2,W('S1'),W('S2')); }
+  else if(n===7){ addM('M1','MATCH 1',0,T(t[1]),T(t[2])); addM('M2','MATCH 2',0,T(t[3]),T(t[4])); addM('M3','MATCH 3',0,T(t[5]),T(t[6]));
+    addM('S1','MATCH 4',1,T(t[0]),W('M1')); addM('S2','MATCH 5',1,W('M2'),W('M3')); addM('F','MATCH 6 (FINAL)',2,W('S1'),W('S2')); }
+  else if(n===8){ addM('M1','MATCH 1',0,T(t[0]),T(t[1])); addM('M2','MATCH 2',0,T(t[2]),T(t[3])); addM('M3','MATCH 3',0,T(t[4]),T(t[5])); addM('M4','MATCH 4',0,T(t[6]),T(t[7]));
+    addM('S1','MATCH 5',1,W('M1'),W('M2')); addM('S2','MATCH 6',1,W('M3'),W('M4')); addM('F','MATCH 7 (FINAL)',2,W('S1'),W('S2')); }
+
+  for(const id in M) for(const s of [M[id].a,M[id].b])
+    if(s.from){ s.via ? links.push([s.from,s.via],[s.via,id]) : links.push([s.from,id]); }
+  links.push([finalId,'CH']);
+
+  const titles = n===2?['FINAL'] : n===3?['BABAK 1','FINAL'] : n===4?['SEMIFINAL','FINAL'] : ['BABAK 1','SEMIFINAL','FINAL'];
+  return {cols,M,links,finalId,titles,n};
+}
+
+const slotTeam = s => s.team ? s.team : (s.from && winners[s.from]) || null;
+
+function render(){
+  bracket = buildBracket();
+  const board = $('#board'); board.innerHTML = '';
+  if(bracket.n < 2){ board.innerHTML = '<p style="padding:30px">Minimal 2 tim untuk membuat bagan.</p>'; renderTeams(); return; }
+
+  bracket.cols.forEach((items,i)=>{
+    const col = document.createElement('div'); col.className='col';
+    col.innerHTML = `<div class="colTitle">${bracket.titles[i]}</div>`;
+    (items||[]).forEach(it=>{
+      if(it.kind==='bye'){ const d=document.createElement('div'); d.className='bye'; d.id='box-BYE'; d.textContent='🟢 '+it.text; col.appendChild(d); return; }
+      const m = bracket.M[it.id];
+      const ta = slotTeam(m.a), tb = slotTeam(m.b), ready = ta && tb, w = winners[m.id];
+      const box = document.createElement('div'); box.className='match'; box.id='box-'+m.id;
+      const slotHtml = (s,name)=>{
+        if(!name) return `<div class="slot tbd"><span>— Pemenang ${s.from?'Match '+s.from.replace('M',''):''} —</span></div>`;
+        let cls='slot ready', extra='';
+        if(w){ if(w===name){cls+=' win'; extra='<span>✔</span>';} else {cls+=' lose'; extra='<span class="x">❌</span>';} }
+        return `<button class="${cls}" data-m="${m.id}" data-team="${esc(name)}"><span>${esc(name)}</span>${extra}</button>`;
+      };
+      box.innerHTML = `<div class="mTitle">${m.title}</div>` + slotHtml(m.a,ta) + slotHtml(m.b,tb);
+      col.appendChild(box);
+    });
+    board.appendChild(col);
+  });
+
+  const ch = document.createElement('div'); ch.className='col';
+  const fw = winners[bracket.finalId];
+  ch.innerHTML = `<div class="colTitle">JUARA</div><div class="champ" id="box-CH" style="font-size:${fw?'16':'30'}px">${fw?'🏆<br>'+esc(fw):'🏆'}</div>`;
+  board.appendChild(ch);
+
+  renderTeams();
+  requestAnimationFrame(drawLines);
+}
+
+function drawLines(){
+  const board=$('#board');
+  let svg = document.getElementById('lines');
+  if(!svg){ svg=document.createElementNS('http://www.w3.org/2000/svg','svg'); svg.id='lines'; board.appendChild(svg); }
+  svg.setAttribute('width',board.scrollWidth); svg.setAttribute('height',board.scrollHeight);
+  const br = board.getBoundingClientRect();
+  let out = '<defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#444"/></marker></defs>';
+  bracket.links.forEach(([a,b])=>{
+    const ea=document.getElementById('box-'+a), eb=document.getElementById('box-'+b);
+    if(!ea||!eb) return;
+    const ra=ea.getBoundingClientRect(), rb=eb.getBoundingClientRect();
+    const x1=ra.right-br.left+board.scrollLeft, y1=ra.top-br.top+board.scrollTop+ra.height/2;
+    const x2=rb.left-br.left+board.scrollLeft-4,  y2=rb.top-br.top+board.scrollTop+rb.height/2;
+    const mid=(x1+x2)/2;
+    out += `<path d="M${x1} ${y1} H${mid} V${y2} H${x2}" stroke="#444" stroke-width="2" fill="none" marker-end="url(#ar)"/>`;
+  });
+  svg.innerHTML = out;
+}
+
+function renderTeams(){
+  const list=$('#teamList'); list.innerHTML='';
+  teams.forEach((t,i)=>{
+    const r=document.createElement('div'); r.className='teamRow';
+    r.innerHTML = `<span class="nm">${i+1}. ${esc(t)}</span>${i===0?'<span class="seed">★ unggulan</span>':''}
+      <button data-act="up" data-i="${i}" ${i===0?'disabled':''}>⬆</button>
+      <button data-act="down" data-i="${i}" ${i===teams.length-1?'disabled':''}>⬇</button>
+      <button data-act="del" data-i="${i}">✕</button>`;
+    list.appendChild(r);
+  });
+  $('#addBtn').disabled = teams.length>=8;
+}
+
+function clearDown(mid){
+  for(const id in bracket.M){
+    const m=bracket.M[id];
+    if([m.a,m.b].some(s=>s.from===mid) && winners[id]){ delete winners[id]; clearDown(id); }
+  }
+}
+
+$('#board').addEventListener('click', e=>{
+  const btn=e.target.closest('.slot.ready'); if(!btn) return;
+  const mid=btn.dataset.m, team=btn.dataset.team;
+  if(winners[mid]===team){ delete winners[mid]; } else { winners[mid]=team; }
+  clearDown(mid); render();
+});
+
+$('#teamList').addEventListener('click', e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  const i=+b.dataset.i; winners={};
+  if(b.dataset.act==='up' && i>0) [teams[i-1],teams[i]]=[teams[i],teams[i-1]];
+  if(b.dataset.act==='down' && i<teams.length-1) [teams[i+1],teams[i]]=[teams[i],teams[i+1]];
+  if(b.dataset.act==='del') teams.splice(i,1);
+  render();
+});
+
+$('#addBtn').onclick = ()=>{
+  const v=$('#newTeam').value.trim();
+  if(!v || teams.length>=8) return;
+  teams.push(v); $('#newTeam').value=''; winners={}; render();
+};
+$('#newTeam').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#addBtn').click(); });
+$('#shuffleBtn').onclick = ()=>{ for(let i=teams.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[teams[i],teams[j]]=[teams[j],teams[i]];} winners={}; render(); };
+$('#resetBtn').onclick = ()=>{ winners={}; render(); };
+$('#defaultBtn').onclick = ()=>{ teams=[...DEF]; winners={}; render(); };
+window.addEventListener('resize', ()=>drawLines());
+
+render();
+</script>
+</body>
+</html>
