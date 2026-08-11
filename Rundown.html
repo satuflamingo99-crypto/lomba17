@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GMDP Cup 🕐 — Rundown Acara</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif}
+body{background:linear-gradient(180deg,#7dd3fc,#e0f2fe 60%,#fef9c3);min-height:100vh;padding:16px;color:#0f172a}
+.wrap{max-width:860px;margin:0 auto}
+header{padding:8px 0 4px;text-align:center}
+h1{font-size:1.3rem;color:#0c4a6e}
+h1 .balon{font-size:1.4rem;animation:fl 2.6s ease-in-out infinite}
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.bar{display:flex;gap:10px;justify-content:center;margin:6px 0 12px;flex-wrap:wrap}
+a.btn,button.btn{display:inline-block;background:#0ea5e9;color:#fff;padding:8px 14px;font-weight:700;border-radius:10px;box-shadow:0 3px 0 #0369a1;text-decoration:none;border:none;cursor:pointer}
+button.btn.red{background:#ef4444;box-shadow:0 3px 0 #b91c1c}
+.btn:active{transform:translateY(2px);box-shadow:none}
+.prog{margin:8px auto;max-width:760px;text-align:center;font-weight:900;background:#fff;border:2px solid #111;border-radius:12px;padding:9px;letter-spacing:1px;font-size:.9rem}
+.item{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border:2px solid #111;border-radius:14px;padding:12px 14px;margin:10px auto;max-width:760px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.2)}
+.item:active{transform:scale(.99)}
+.no{width:34px;height:34px;border-radius:50%;background:#ffe600;border:2px solid #111;display:flex;align-items:center;justify-content:center;font-weight:900;flex:none}
+.waktu{flex:none;background:#e0f2fe;border:1.5px solid #0369a1;color:#0c4a6e;border-radius:10px;padding:4px 8px;font-weight:800;font-size:.78rem}
+.nama{flex:1;font-weight:700;font-size:.93rem}
+.st{flex:none;font-size:.68rem;font-weight:800;border-radius:8px;padding:4px 8px;background:#e2e8f0;color:#475569}
+.item.done{background:#bbf7d0}
+.item.done .nama{text-decoration:line-through;color:#166534}
+.item.done .no{background:#16a34a;color:#fff}
+.item.done .st{background:#16a34a;color:#fff}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111;color:#ffe600;padding:10px 18px;border-radius:12px;font-weight:800;opacity:0;pointer-events:none;transition:.3s;z-index:99}
+#toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <header><h1><span class="balon">🕐</span> RUNDOWN ACARA — GMDP CUP <span class="balon">🇮🇩</span></h1></header>
+ <div class="bar">
+  <a class="btn" href="index.html">⬅ Menu Utama</a>
+  <button class="btn red" onclick="resetR()">🔄 Reset Tandai</button>
+ </div>
+ <div class="prog" id="prog"></div>
+ <div id="list"></div>
+</div>
+<div id="toast"></div>
+<script>
+const ACARA=[
+ ["08.00","08.10","Menyanyikan lagu Indonesia Raya & lagu 17 Agustus","🎤"],
+ ["08.10","08.20","Pembagian kelompok & arahan lomba","📋"],
+ ["08.20","08.40","Estafet Balon (Lomba Kelompok)","🎈"],
+ ["08.40","09.15","Memasukkan Pulpen (Lomba Individu)","✏️"],
+ ["09.15","09.45","Memasukkan Sedotan pakai Hidung (Lomba Kelompok)","🥤"],
+ ["09.45","10.00","Pembagian Hadiah","🏆"]
+];
+let done=ACARA.map(()=>false);
+const $=s=>document.querySelector(s);
+let tT;function flash(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),1800);}
+const KEY='gmdp_rundown_v1';
+function save(){try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}}
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY)||'null');if(Array.isArray(d)&&d.length===ACARA.length)done=d}catch(e){}}
+function tog(i){done[i]=!done[i];render();flash(done[i]?'Nomor '+(i+1)+' ditandai SELESAI ✔':'Nomor '+(i+1)+' kembali BELUM.');}
+function resetR(){done=ACARA.map(()=>false);render();flash('Semua tandai direset.');}
+function render(){
+ $('#list').innerHTML=ACARA.map((a,i)=>
+  '<div class="item'+(done[i]?' done':'')+'" onclick="tog('+i+')">'+
+  '<div class="no">'+(i+1)+'</div>'+
+  '<div class="waktu">'+a[0]+' – '+a[1]+'</div>'+
+  '<div class="nama">'+a[3]+' '+a[2]+'</div>'+
+  '<div class="st">'+(done[i]?'✔ SELESAI':'BELUM')+'</div></div>'
+ ).join('');
+ const c=done.filter(Boolean).length;
+ $('#prog').textContent=(c===ACARA.length?'🎉 SEMUA ACARA SELESAI!':c+' / '+ACARA.length+' ACARA SELESAI');
+ save();
+}
+load();
+render();
+</script>
+</body>
+</html>
