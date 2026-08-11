@@ -80,7 +80,8 @@ footer{text-align:center;font-weight:800;padding:14px 0 20px;color:#475569;font-
  <a class="btn blue" href="index.html">⬅ Menu Utama</a>
  <button class="btn red" onclick="Wn={};Pod=[];render();flash('Bagan direset.')">🔄 Reset Bagan</button>
 </div>
-<div class="small">
+<div class="small">Babak 1: klik nama pemenang (✔), yang kalah dicoret • Pemenang masuk FINAL: klik <b>berurutan</b> = 🥇 →  → 🥉 • Klik nama berpodium untuk membatalkan.</div>
+
 <div id="w"><div id="b"></div></div>
 
 <div class="podium">
@@ -111,6 +112,12 @@ const $=s=>document.querySelector(s);
 const E=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let tT;function flash(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),1800);}
 
+/* ===== SIMPAN OTOMATIS (localStorage) ===== */
+const KEY='gmdp_sedotan_v1';
+function save(){try{localStorage.setItem(KEY,JSON.stringify({T,Wn,Pod}))}catch(e){}}
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY)||'null');
+ if(d){if(Array.isArray(d.T)&&d.T.length>=2)T=d.T;Wn=(d.Wn&&typeof d.Wn=='object')?d.Wn:{};Pod=Array.isArray(d.Pod)?d.Pod:[]}}catch(e){}}
+
 function slot(mi,idx){
  const nm=T[idx];let c='s r',x='';const w=Wn['M'+mi];
  if(w){if(w==nm){c+=' w';x='<span>✔</span>'}else{c+=' k';x='<span class="x">✗</span>'}}
@@ -118,7 +125,7 @@ function slot(mi,idx){
 }
 function render(){
  const n=T.length,b=$('#b');b.innerHTML='';CUR=null;
- if(n<2){b.innerHTML='<p style="padding:20px">Minimal 2 kelompok.</p>';rt();ra();return}
+ if(n<2){b.innerHTML='<p style="padding:20px">Minimal 2 kelompok.</p>';rt();ra();save();return}
  const M=[];for(let i=0;i+1<n;i+=2)M.push([i,i+1]);if(n%2)M.push([n-1,null]);
  CUR={M};
  const c1=document.createElement('div');c1.className='c';c1.innerHTML='<div class="ct">BABAK 1</div>';
@@ -132,7 +139,7 @@ function render(){
  const winners=M.map((pr,mi)=>pr[1]==null?T[pr[0]]:(Wn['M'+mi]||null));
  CUR.winners=winners;
  const c2=document.createElement('div');c2.className='c';
- let fh='<div class="ct">FINAL — PILIH JUARA 1‑2‑3</div><div class="m" id="box-FIN"><div class="mt">Klik berurutan: 🥇 → 🥈 → </div>';
+ let fh='<div class="ct">FINAL — PILIH JUARA 1‑2‑3</div><div class="m" id="box-FIN"><div class="mt">Klik berurutan: 🥇 →  → </div>';
  M.forEach((pr,mi)=>{
   const w2=winners[mi];
   if(!w2)fh+='<div class="s t"><span>Winner Match '+(mi+1)+'</span></div>';
@@ -140,7 +147,7 @@ function render(){
    fh+='<button class="s r'+(px>=0?' r'+(px+1):'')+'" data-w="'+E(w2)+'"><span>'+E(w2)+'</span>'+(px>=0?'<span>'+['🥇','','🥉'][px]+'</span>':'')+'</button>'}
  });
  fh+='</div>';c2.innerHTML=fh;b.appendChild(c2);
- rt();ra();
+ rt();ra();save();
  $('#j1').textContent=Pod[0]||'—';$('#j2').textContent=Pod[1]||'—';$('#j3').textContent=Pod[2]||'—';
  requestAnimationFrame(dl)
 }
@@ -197,6 +204,7 @@ $('#re').onclick=()=>{Wn={};Pod=[];render()};
 $('#de').onclick=()=>{T=[...D];Wn={};Pod=[];render()};
 $('#g').onclick=()=>{$('#p').classList.toggle('open')};
 addEventListener('resize',dl);
+load();
 render();
 </script>
 </body>
