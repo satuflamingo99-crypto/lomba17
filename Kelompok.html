@@ -77,7 +77,7 @@ footer{text-align:center;font-weight:800;padding:14px 0 20px;color:#475569;font-
  <a class="btn blue" href="index.html">⬅ Menu Utama</a>
  <button class="btn red" onclick="document.getElementById('re').click()">🔄 Reset Pemenang</button>
 </div>
-<div class="small"></div>
+<div class="small">Klik nama tim di slot untuk memilih pemenang. Kalah = gugur.</div>
 
 <div id="w"><div id="b"></div></div>
 
@@ -98,6 +98,12 @@ const ANG={
 let T=[...D],Wn={},B=null;
 const $=s=>document.querySelector(s);
 const E=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ===== SIMPAN OTOMATIS (localStorage) ===== */
+const KEY='gmdp_kelompok_v1';
+function save(){try{localStorage.setItem(KEY,JSON.stringify({T,Wn}))}catch(e){}}
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY)||'null');
+ if(d){if(Array.isArray(d.T)&&d.T.length>=2)T=d.T;Wn=(d.Wn&&typeof d.Wn=='object')?d.Wn:{}}}catch(e){}}
 
 function bb(){
  const t=T.slice(0,8),n=t.length,C=[],M={},L=[];
@@ -125,7 +131,7 @@ function sl(m,s){
 }
 function render(){
  B=bb();const b=$('#b');b.innerHTML='';
- if(B.n<2){b.innerHTML='<p style="padding:20px">Minimal 2 tim.</p>';rt();ra();return}
+ if(B.n<2){b.innerHTML='<p style="padding:20px">Minimal 2 tim.</p>';rt();ra();save();return}
  B.C.forEach((it,i)=>{
   const c=document.createElement('div');c.className='c';
   c.innerHTML='<div class="ct">'+B.ti[i]+'</div>';
@@ -139,7 +145,7 @@ function render(){
  const ch=document.createElement('div');ch.className='c';const fw=Wn.F;
  ch.innerHTML='<div class="ct">🏆 JUARA</div><div class="j'+(fw?' w':'')+'" id="box-CH">'+(fw?'<span class="trofi">🏆</span><div>'+E(fw)+'</div>':'<span class="trofi">🏆</span><div style="color:#94a3b8;font-weight:500">belum ada</div>')+'</div>';
  b.appendChild(ch);
- rt();ra();requestAnimationFrame(dl)
+ rt();ra();save();requestAnimationFrame(dl)
 }
 function dl(){
  const b=$('#b');let v=document.getElementById('l');
@@ -181,6 +187,7 @@ $('#re').onclick=()=>{Wn={};render()};
 $('#de').onclick=()=>{T=[...D];Wn={};render()};
 $('#g').onclick=()=>{$('#p').classList.toggle('open')};
 addEventListener('resize',dl);
+load();
 render();
 </script>
 </body>
