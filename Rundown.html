@@ -12,10 +12,11 @@ header{padding:8px 0 4px;text-align:center}
 h1{font-size:1.3rem;color:#0c4a6e}
 h1 .balon{font-size:1.4rem;animation:fl 2.6s ease-in-out infinite}
 @keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-.bar{display:flex;gap:10px;justify-content:center;margin:6px 0 12px;flex-wrap:wrap}
+.bar{display:flex;gap:10px;justify-content:center;margin:6px 0 10px;flex-wrap:wrap}
 a.btn,button.btn{display:inline-block;background:#0ea5e9;color:#fff;padding:8px 14px;font-weight:700;border-radius:10px;box-shadow:0 3px 0 #0369a1;text-decoration:none;border:none;cursor:pointer}
 button.btn.red{background:#ef4444;box-shadow:0 3px 0 #b91c1c}
 .btn:active{transform:translateY(2px);box-shadow:none}
+.small{text-align:center;font-size:.75rem;color:#475569;margin:0 0 8px}
 .prog{margin:8px auto;max-width:760px;text-align:center;font-weight:900;background:#fff;border:2px solid #111;border-radius:12px;padding:9px;letter-spacing:1px;font-size:.9rem}
 .item{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border:2px solid #111;border-radius:14px;padding:12px 14px;margin:10px auto;max-width:760px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.2)}
 .item:active{transform:scale(.99)}
@@ -27,17 +28,21 @@ button.btn.red{background:#ef4444;box-shadow:0 3px 0 #b91c1c}
 .item.done .nama{text-decoration:line-through;color:#166534}
 .item.done .no{background:#16a34a;color:#fff}
 .item.done .st{background:#16a34a;color:#fff}
+.mcbtn{flex:none;background:#1095db;color:#fff;border:none;border-radius:8px;padding:5px 9px;font-weight:800;font-size:.7rem;cursor:pointer;box-shadow:0 2px 0 #0b6fa8}
+.mcbtn:active{transform:translateY(1px);box-shadow:none}
+.mcbox{flex-basis:100%;background:#f0f9ff;border:1.5px dashed #0b7ec4;border-radius:10px;padding:10px 12px;font-size:.82rem;white-space:pre-line;color:#0f172a;margin-top:4px;line-height:1.5}
 #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111;color:#ffe600;padding:10px 18px;border-radius:12px;font-weight:800;opacity:0;pointer-events:none;transition:.3s;z-index:99}
 #toast.show{opacity:1}
 </style>
 </head>
 <body>
 <div class="wrap">
- <header><h1><span class="balon">🕐</span> RUNDOWN ACARA — GMDP CUP <span class="balon">🇮🇩</span></h1></header>
+ <header><h1><span class="balon">🕐</span> RUNDOWN ACARA — GMDP CUP <span class="balon">🇮</span></h1></header>
  <div class="bar">
   <a class="btn" href="index.html">⬅ Menu Utama</a>
   <button class="btn red" onclick="resetR()">🔄 Reset Tandai</button>
  </div>
+ <div class="small">Klik baris = tandai selesai • Klik 🎤 MC = buka/tutup teks MC</div>
  <div class="prog" id="prog"></div>
  <div id="list"></div>
 </div>
@@ -49,15 +54,128 @@ const ACARA=[
  ["08.20","08.40","Estafet Balon (Lomba Kelompok)","🎈"],
  ["08.40","09.15","Memasukkan Pulpen (Lomba Individu)","✏️"],
  ["09.15","09.45","Memasukkan Sedotan pakai Hidung (Lomba Kelompok)","🥤"],
- ["09.45","10.00","Pembagian Hadiah","🏆"]
+ ["09.45","10.00","Pembagian Hadiah & Penutup","🏆"]
 ];
-let done=ACARA.map(()=>false);
+const MC=[
+`Assalamu'alaikum warahmatullahi wabarakatuh.
+Selamat pagi dan salam sejahtera untuk kita semua!
+Yang kami hormati Bapak/Ibu serta seluruh peserta acara yang kami banggakan.
+
+Puji syukur kita panjatkan ke hadirat Tuhan Yang Maha Esa, karena atas rahmat dan karunia-Nya, pada hari ini kita dapat berkumpul bersama dalam rangka memperingati Hari Kemerdekaan Republik Indonesia.
+Dirgahayu Republik Indonesia!
+Merdeka! Merdeka! Merdeka!
+
+Hadirin dan peserta yang berbahagia, pagi hari ini kita akan bersama-sama mengikuti berbagai perlombaan yang sudah disiapkan untuk memeriahkan suasana kemerdekaan.
+
+Sebelum kita memulai rangkaian perlombaan, marilah kita berdiri bersama untuk menyanyikan lagu kebangsaan Indonesia Raya, dilanjutkan dengan lagu 17 Agustus.
+Kepala seluruh peserta, dimohon untuk berdiri.
+
+(Lagu Indonesia Raya diputar)
+(Dilanjutkan lagu 17 Agustus)
+
+Terima kasih. Hadirin dipersilakan duduk kembali.`,
+`Selanjutnya, kita memasuki acara berikutnya, yaitu pembagian kelompok dan arahan perlombaan.
+
+Kepada seluruh peserta, harap memperhatikan pembagian kelompok masing-masing dan menyimak arahan dari panitia agar seluruh perlombaan dapat berjalan dengan tertib dan tetap seru.
+
+Ingat, tujuan utama kita hari ini bukan hanya mencari pemenang, tetapi juga bersenang-senang, mempererat kebersamaan, dan memeriahkan Hari Kemerdekaan Republik Indonesia.
+
+Untuk para peserta, jangan lupa: sportif, kompak, dan yang paling penting... jangan sampai kalah sebelum bertanding!
+
+Kepada panitia, dipersilakan untuk memberikan arahan dan pembagian kelompok.`,
+`Baik, setelah pembagian kelompok dan arahan lomba selesai, sekarang kita masuk ke lomba yang pertama!
+Yaitu... ESTAFET BALON!
+
+Lomba ini merupakan lomba kelompok, jadi kekompakan dan kerja sama tim sangat menentukan kemenangan.
+Kepada seluruh peserta yang sudah mendapatkan kelompok, silakan menempati posisi yang telah ditentukan.
+
+Panitia, apakah sudah siap?
+Peserta, apakah sudah siap?
+Kalau sudah siap, kita mulai dalam hitungan...
+3... 2... 1... MULAI!
+
+(Selama lomba berlangsung)
+Wah, seru sekali!
+Ayo, jangan sampai balonnya jatuh!
+Semangat untuk semua kelompok!
+Dan akhirnya... selesai!
+
+Selamat kepada seluruh peserta yang sudah mengikuti lomba Estafet Balon.`,
+`Selanjutnya kita masuk ke lomba kedua.
+Kali ini adalah lomba Memasukkan Pulpen, dan lomba ini merupakan lomba individu.
+Untuk para peserta, silakan bersiap di tempat yang telah disediakan.
+
+Kelihatannya sederhana, tetapi jangan salah... lomba ini membutuhkan konsentrasi, kesabaran, dan ketepatan.
+Jangan sampai tangan gemetar karena ditonton banyak orang!
+
+Peserta sudah siap?
+Kalau sudah...
+3... 2... 1... MULAI!
+
+(Selama lomba berlangsung)
+Ayo, fokus!
+Sedikit lagi!
+Jangan menyerah!
+Dan... selesai!
+
+Berikan tepuk tangan yang meriah untuk seluruh peserta yang sudah berjuang!`,
+`Baik, kita lanjut ke perlombaan berikutnya yang pastinya tidak kalah seru.
+Lomba selanjutnya adalah... MEMASUKKAN SEDOTAN MENGGUNAKAN HIDUNG!
+Dan lomba ini merupakan lomba kelompok.
+
+Nah, kalau lomba yang satu ini sepertinya membutuhkan kekompakan sekaligus kelenturan yang luar biasa.
+Kepada seluruh peserta, silakan bersiap dan menempati posisi masing-masing.
+Ingat, tetap sportif dan jangan terlalu serius. Kita di sini untuk bersenang-senang!
+
+Sudah siap semuanya?
+Kalau sudah...
+3... 2... 1... MULAI!
+
+(Selama lomba berlangsung)
+Wah, luar biasa!
+Ayo, semangat!
+Kelompok yang lain juga jangan kalah!
+Sedikit lagi... sedikit lagi...
+Dan... SELESAI!
+
+Tepuk tangan yang paling meriah untuk seluruh peserta!`,
+`Hadirin dan peserta yang kami banggakan,
+Tidak terasa seluruh rangkaian perlombaan telah kita lalui bersama.
+Tentunya banyak sekali keseruan, tawa, dan momen-momen yang akan menjadi kenangan dalam perayaan kemerdekaan kita hari ini.
+
+Kini tibalah saat yang paling ditunggu-tunggu... PEMBAGIAN HADIAH!
+
+Kepada para pemenang lomba, kami ucapkan selamat atas kemenangan yang telah diraih.
+Dan bagi yang belum mendapatkan juara, jangan berkecil hati. Karena yang terpenting adalah kita sudah ikut berpartisipasi, bersenang-senang, dan menjaga semangat kebersamaan.
+Karena dalam semangat kemerdekaan: Menang kita rayakan, kalah kita tetap tertawa!
+
+Selanjutnya, kami persilakan kepada panitia untuk memanggil para pemenang dan menyerahkan hadiah.
+
+(Pembagian hadiah berlangsung)
+
+Sekali lagi, selamat kepada seluruh pemenang!
+
+— PENUTUP —
+Hadirin yang kami hormati,
+Dengan berakhirnya pembagian hadiah, maka berakhir pula seluruh rangkaian acara peringatan Hari Kemerdekaan Republik Indonesia pada hari ini.
+
+Terima kasih kepada seluruh panitia yang telah mempersiapkan acara ini, dan terima kasih kepada seluruh peserta yang telah berpartisipasi dengan penuh semangat dan keceriaan.
+Mari kita terus jaga semangat persatuan, kebersamaan, dan gotong royong dalam kehidupan sehari-hari.
+
+Akhir kata, saya selaku MC mohon maaf apabila selama memandu acara terdapat kata-kata atau ucapan yang kurang berkenan.
+Dirgahayu Republik Indonesia!
+Merdeka! Merdeka! Merdeka!
+Wassalamu'alaikum warahmatullahi wabarakatuh.
+Terima kasih dan sampai jumpa di acara berikutnya!`
+];
+let done=ACARA.map(()=>false),openMC=ACARA.map(()=>false);
 const $=s=>document.querySelector(s);
 let tT;function flash(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),1800);}
 const KEY='gmdp_rundown_v1';
 function save(){try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}}
 function load(){try{const d=JSON.parse(localStorage.getItem(KEY)||'null');if(Array.isArray(d)&&d.length===ACARA.length)done=d}catch(e){}}
 function tog(i){done[i]=!done[i];render();flash(done[i]?'Nomor '+(i+1)+' ditandai SELESAI ✔':'Nomor '+(i+1)+' kembali BELUM.');}
+function togMC(i){openMC[i]=!openMC[i];$('#mc'+i).style.display=openMC[i]?'block':'none';}
 function resetR(){done=ACARA.map(()=>false);render();flash('Semua tandai direset.');}
 function render(){
  $('#list').innerHTML=ACARA.map((a,i)=>
@@ -65,8 +183,11 @@ function render(){
   '<div class="no">'+(i+1)+'</div>'+
   '<div class="waktu">'+a[0]+' – '+a[1]+'</div>'+
   '<div class="nama">'+a[3]+' '+a[2]+'</div>'+
-  '<div class="st">'+(done[i]?'✔ SELESAI':'BELUM')+'</div></div>'
+  '<button class="mcbtn" onclick="event.stopPropagation();togMC('+i+')">🎤 MC</button>'+
+  '<div class="st">'+(done[i]?'✔ SELESAI':'BELUM')+'</div>'+
+  '<div class="mcbox" id="mc'+i+'" onclick="event.stopPropagation()" style="display:'+(openMC[i]?'block':'none')+'"></div></div>'
  ).join('');
+ MC.forEach((t,i)=>{document.getElementById('mc'+i).textContent=t});
  const c=done.filter(Boolean).length;
  $('#prog').textContent=(c===ACARA.length?'🎉 SEMUA ACARA SELESAI!':c+' / '+ACARA.length+' ACARA SELESAI');
  save();
