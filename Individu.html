@@ -84,6 +84,21 @@ let tT;function flash(m){const t=el("toast");t.textContent=m;t.classList.add("sh
 const nm=id=>N[+id.charAt(1)][+id.charAt(3)];
 const finA=()=>[...I.heat[0],...I.heat[1],...I.heat[2]];
 const finB=()=>[...I.heat[3],...I.heat[4],...I.heat[5]];
+
+/* ===== SIMPAN OTOMATIS (localStorage) ===== */
+const KEY='gmdp_individu_v1';
+function save(){try{localStorage.setItem(KEY,JSON.stringify({N,I}))}catch(e){}}
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY)||'null');
+ if(d){
+  if(Array.isArray(d.N)&&d.N.length===6&&d.N.every(r=>Array.isArray(r)&&r.length===5))N=d.N;
+  if(d.I&&Array.isArray(d.I.heat)&&d.I.heat.length===6){
+   I.heat=d.I.heat;
+   I.podA=Array.isArray(d.I.podA)?d.I.podA:[];
+   I.podB=Array.isArray(d.I.podB)?d.I.podB:[];
+  }
+ }
+}catch(e){}}
+
 function toggleMove(){moveMode=!moveMode;picked=null;
  el("btnMove").textContent="⚙ Mode Pindah: "+(moveMode?"ON":"OFF");
  renderI();flash(moveMode?"Mode pindah AKTIF.":"Mode pindah nonaktif.");}
@@ -136,7 +151,9 @@ function renderI(){
  el("j1b").textContent=I.podB[0]?nm(I.podB[0]):"—";
  el("j2b").textContent=I.podB[1]?nm(I.podB[1]):"—";
  el("j3b").textContent=I.podB[2]?nm(I.podB[2]):"—";
+ save();
 }
+load();
 renderI();
 </script>
 </body>
