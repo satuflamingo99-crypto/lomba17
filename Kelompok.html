@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GMDP Cup 🎈 — Balap Estafet Balon</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif}
+body{background:linear-gradient(180deg,#7dd3fc,#e0f2fe 60%,#fef9c3);min-height:100vh;color:#0f172a;padding:14px}
+header{padding:8px 0 4px;text-align:center}
+h1{font-size:1.3rem;letter-spacing:.5px;color:#0c4a6e}
+h1 .balon{font-size:1.4rem;animation:fl 2.6s ease-in-out infinite}
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+a.btn,button.btn{display:inline-block;border:none;border-radius:10px;padding:8px 14px;font-weight:700;cursor:pointer;text-decoration:none;font-size:.9rem;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.btn.blue{background:#0ea5e9;color:#fff;box-shadow:0 3px 0 #0369a1}
+.btn.yellow{background:#ffe600;color:#111;box-shadow:0 3px 0 #ca8a04}
+.btn.red{background:#ef4444;color:#fff;box-shadow:0 3px 0 #b91c1c}
+.btn:active{transform:translateY(2px);box-shadow:none}
+.bar{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:6px 0 10px}
+.small{text-align:center;font-size:.75rem;color:#475569;margin:2px 0 6px}
+#g{position:fixed;top:14px;right:14px;z-index:9;background:#ffe600;color:#111;border:2px solid #111;border-radius:12px;padding:8px 12px;font-size:1rem;font-weight:800;cursor:pointer;box-shadow:0 3px 0 #ca8a04}
+#g:active{transform:translateY(2px);box-shadow:none}
+#p{position:fixed;top:54px;right:14px;z-index:9;background:#fff;border:2px solid #111;border-radius:16px;padding:14px;width:260px;box-shadow:0 10px 24px rgba(2,132,199,.3);display:none}
+#p.open{display:block}
+#p h2{font-size:.85rem;margin:0 0 8px;color:#0c4a6e;letter-spacing:1px}
+.tr{display:flex;gap:4px;align-items:center;border:1.5px solid #111;border-radius:8px;padding:5px 7px;margin-bottom:5px;background:#fef9c3}
+.tr b{flex:1;font-size:.82rem}
+.tr button{padding:3px 7px;font-size:.8rem}
+.ar{display:flex;gap:5px;margin-top:8px}
+.ar input{flex:1;border:1.5px solid #111;border-radius:8px;padding:6px 8px;font-size:.85rem;outline:none}
+#w{overflow:auto;margin-top:6px}
+#b{display:flex;gap:44px;padding:14px 20px 30px;width:max-content;min-width:100%;position:relative}
+#l{position:absolute;top:0;left:0;pointer-events:none}
+.c{display:flex;flex-direction:column;gap:22px;justify-content:space-around;min-width:220px;flex:1}
+.ct{background:#ffe600;border:2px solid #111;text-align:center;font-weight:800;padding:8px;border-radius:10px;font-size:.82rem;letter-spacing:.8px}
+.m{background:#fff;border:2px solid #111;border-radius:12px;overflow:hidden;box-shadow:0 4px 0 rgba(0,0,0,.2)}
+.mt{font-size:.7rem;font-weight:800;text-align:center;background:#f1f5f9;border-bottom:1.5px solid #111;padding:4px;color:#475569;letter-spacing:.5px}
+.s{display:flex;justify-content:space-between;width:100%;padding:9px 11px;background:#fff;border:0;border-top:1.5px solid #e2e8f0;font:inherit;font-weight:600;font-size:.88rem}
+.mt+.s{border-top:0}
+.s.r{cursor:pointer}
+.s.r:hover{background:#bae6fd}
+.s.w{background:#bbf7d0;color:#166534;font-weight:800}
+.s.k{color:#b91c1c;text-decoration:line-through;opacity:.7}
+.s .x{color:#b91c1c;font-weight:900;margin-left:4px}
+.s.t{color:#94a3b8;font-style:italic;font-weight:500}
+.by{border:2px dashed #16a34a;background:#dcfce7;color:#166534;border-radius:10px;padding:11px;text-align:center;font-weight:800;font-size:.72rem}
+.j{border:2px solid #111;border-radius:14px;padding:18px;text-align:center;font-weight:900;min-height:92px;display:flex;align-items:center;justify-content:center;background:#fff;flex-direction:column;gap:4px}
+.j.w{background:linear-gradient(135deg,#fde047,#ca8a04);color:#fff;text-shadow:1px 1px 0 rgba(0,0,0,.2)}
+.j .trofi{font-size:1.8rem}
+.judul{background:#ffe600;border:2px solid #111;border-radius:12px;padding:8px;text-align:center;font-size:1rem;margin:16px auto 10px;max-width:1150px;font-weight:800}
+.agrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;max-width:1150px;margin:0 auto;padding:0 6px}
+.ag{background:#fff;border:2px solid #111;border-radius:12px;overflow:hidden}
+.ag h4{background:#ffe600;border-bottom:2px solid #111;padding:6px;text-align:center;font-size:.85rem}
+.ag ul{list-style:none;padding:6px 10px}
+.ag li{font-size:.8rem;padding:3px 0;border-bottom:1px dashed #e2e8f0;font-weight:600}
+.ag li:last-child{border:none}
+footer{text-align:center;font-weight:800;padding:14px 0 20px;color:#475569;font-size:.8rem;letter-spacing:.6px}
+</style>
+</head>
+<body>
+
+<button id="g" title="Pengaturan Tim">⚙ TIM</button>
+<div id="p">
+ <h2>🎈 DAFTAR TIM (2–8)</h2>
+ <div id="tl"></div>
+ <div class="ar"><input id="ni" maxlength="20" placeholder="Nama tim baru…"><button class="btn yellow" id="ad">+</button></div>
+ <div class="ar">
+  <button class="btn yellow" id="sh" title="Acak urutan">🎲 Acak</button>
+  <button class="btn blue" id="re" title="Reset pemenang">♻ Reset</button>
+  <button class="btn red" id="de" title="Kembali default">⟲</button>
+ </div>
+</div>
+
+<header><h1><span class="balon">🎈</span> GMDP CUP — LOMBA BALAP ESTAFET BALON <span class="balon">🎈</span></h1></header>
+
+<div class="bar">
+ <a class="btn blue" href="index.html">⬅ Menu Utama</a>
+ <button class="btn red" onclick="document.getElementById('re').click()">🔄 Reset Pemenang</button>
+</div>
+<div class="small"></div>
+
+<div id="w"><div id="b"></div></div>
+
+<h2 class="judul">👥 ANGGOTA KELOMPOK</h2>
+<div class="agrid" id="ag"></div>
+
+<footer>SISTEM GUGUR • KALAH = GUGUR (ELIMINASI)</footer>
+
+<script>
+const D=['Kucing','Kambing','Panda','Singa','Semut'];
+const ANG={
+ "Kucing":["Lia","Mama Yohan","Yohan","Rara","Yayah","Firda"],
+ "Kambing":["Oho","Yosep","Adit","Kisna","Demong","Anak PKL"],
+ "Panda":["Anak PKL","Reza","Rahmat","Mas Tri","Pak Kunto","Pendi"],
+ "Singa":["Mas Palung","Dimas","Mas Kukuh","Triju","Maul","Anak PKL"],
+ "Semut":["Cile","Bayu","Rio","Om Nano","Teguh","Anak PKL"]
+};
+let T=[...D],Wn={},B=null;
+const $=s=>document.querySelector(s);
+const E=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function bb(){
+ const t=T.slice(0,8),n=t.length,C=[],M={},L=[];
+ const A=(id,u,ti,r,a,b)=>{M[id]={id,u,ti,a,b};(C[r]=C[r]||[]).push({k:'m',id})};
+ const X=x=>({t:x}),Q=(x,v)=>({f:x,v});
+ if(n==2)A('F',1,'FINAL',0,X(t[0]),X(t[1]));
+ else if(n==3){A('M1',1,'MATCH 1',0,X(t[1]),X(t[2]));A('F',2,'FINAL',1,X(t[0]),Q('M1'))}
+ else if(n==4){A('S1',1,'MATCH 1',0,X(t[0]),X(t[1]));A('S2',2,'MATCH 2',0,X(t[2]),X(t[3]));A('F',3,'FINAL',1,Q('S1'),Q('S2'))}
+ else if(n==5){A('M1',1,'MATCH 1',0,X(t[1]),X(t[2]));A('M2',2,'MATCH 2',0,X(t[3]),X(t[4]));A('S1',3,'MATCH 3 (SEMIFINAL)',1,X(t[0]),Q('M1'));(C[1]=C[1]||[]).push({k:'b',id:'BYE',tx:'BYE — PEMENANG MATCH 2 LANGSUNG KE FINAL'});A('F',4,'MATCH 4 (FINAL)',2,Q('S1'),Q('M2','BYE'))}
+ else if(n==6){A('M1',1,'MATCH 1',0,X(t[2]),X(t[3]));A('M2',2,'MATCH 2',0,X(t[4]),X(t[5]));A('S1',3,'MATCH 3',1,X(t[0]),Q('M1'));A('S2',4,'MATCH 4',1,X(t[1]),Q('M2'));A('F',5,'FINAL',2,Q('S1'),Q('S2'))}
+ else if(n==7){A('M1',1,'MATCH 1',0,X(t[1]),X(t[2]));A('M2',2,'MATCH 2',0,X(t[3]),X(t[4]));A('M3',3,'MATCH 3',0,X(t[5]),X(t[6]));A('S1',4,'MATCH 4',1,X(t[0]),Q('M1'));A('S2',5,'MATCH 5',1,Q('M2'),Q('M3'));A('F',6,'FINAL',2,Q('S1'),Q('S2'))}
+ else if(n==8){A('M1',1,'MATCH 1',0,X(t[0]),X(t[1]));A('M2',2,'MATCH 2',0,X(t[2]),X(t[3]));A('M3',3,'MATCH 3',0,X(t[4]),X(t[5]));A('M4',4,'MATCH 4',0,X(t[6]),X(t[7]));A('S1',5,'MATCH 5',1,Q('M1'),Q('M2'));A('S2',6,'MATCH 6',1,Q('M3'),Q('M4'));A('F',7,'FINAL',2,Q('S1'),Q('S2'))}
+ for(const i in M)for(const s of[M[i].a,M[i].b])if(s.f){s.v?L.push([s.f,s.v],[s.v,i]):L.push([s.f,i])}
+ L.push(['F','CH']);
+ const ti=n==2?['FINAL']:n==3?['BABAK 1','FINAL']:n==4?['SEMIFINAL','FINAL']:['BABAK 1','SEMIFINAL','FINAL'];
+ return{C,M,L,ti,n}
+}
+const st=s=>s.t?s.t:(s.f&&Wn[s.f])||null;
+function sl(m,s){
+ const nm=st(s);
+ if(!nm)return'<div class="s t"><span>Winner Match '+B.M[s.f].u+'</span></div>';
+ let c='s r',x='';const w=Wn[m.id];
+ if(w){if(w==nm){c+=' w';x='<span>✔</span>'}else{c+=' k';x='<span class="x">✗</span>'}}
+ return'<button class="'+c+'" data-m="'+m.id+'" data-t="'+E(nm)+'"><span>'+E(nm)+'</span>'+x+'</button>'
+}
+function render(){
+ B=bb();const b=$('#b');b.innerHTML='';
+ if(B.n<2){b.innerHTML='<p style="padding:20px">Minimal 2 tim.</p>';rt();ra();return}
+ B.C.forEach((it,i)=>{
+  const c=document.createElement('div');c.className='c';
+  c.innerHTML='<div class="ct">'+B.ti[i]+'</div>';
+  (it||[]).forEach(o=>{
+   if(o.k=='b'){const d=document.createElement('div');d.className='by';d.id='box-BYE';d.textContent=o.tx;c.appendChild(d);return}
+   const m=B.M[o.id],d=document.createElement('div');d.className='m';d.id='box-'+m.id;
+   d.innerHTML='<div class="mt">'+m.ti+'</div>'+sl(m,m.a)+sl(m,m.b);c.appendChild(d)
+  });
+  b.appendChild(c)
+ });
+ const ch=document.createElement('div');ch.className='c';const fw=Wn.F;
+ ch.innerHTML='<div class="ct">🏆 JUARA</div><div class="j'+(fw?' w':'')+'" id="box-CH">'+(fw?'<span class="trofi">🏆</span><div>'+E(fw)+'</div>':'<span class="trofi">🏆</span><div style="color:#94a3b8;font-weight:500">belum ada</div>')+'</div>';
+ b.appendChild(ch);
+ rt();ra();requestAnimationFrame(dl)
+}
+function dl(){
+ const b=$('#b');let v=document.getElementById('l');
+ if(!v){v=document.createElementNS('http://www.w3.org/2000/svg','svg');v.id='l';b.appendChild(v)}
+ v.setAttribute('width',b.scrollWidth);v.setAttribute('height',b.scrollHeight);
+ const r=b.getBoundingClientRect();
+ let o='<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#334155"/></marker></defs>';
+ B.L.forEach(p=>{
+  const ea=document.getElementById('box-'+p[0]),eb=document.getElementById('box-'+p[1]);
+  if(!ea||!eb)return;
+  const ra2=ea.getBoundingClientRect(),rb=eb.getBoundingClientRect();
+  const x1=ra2.right-r.left+b.scrollLeft,y1=ra2.top-r.top+b.scrollTop+ra2.height/2,
+        x2=rb.left-r.left+b.scrollLeft-4,y2=rb.top-r.top+b.scrollTop+rb.height/2,md=(x1+x2)/2;
+  o+='<path d="M'+x1+' '+y1+' H'+md+' V'+y2+' H'+x2+'" stroke="#334155" stroke-width="2" fill="none" marker-end="url(#a)"/>'
+ });
+ v.innerHTML=o
+}
+function rt(){
+ const l=$('#tl');l.innerHTML='';
+ T.forEach((t,i)=>{
+  const d=document.createElement('div');d.className='tr';
+  d.innerHTML='<b>'+(i+1)+'. '+E(t)+'</b><button class="btn yellow" data-a="u" data-i="'+i+'">⬆</button><button class="btn yellow" data-a="d" data-i="'+i+'">⬇</button><button class="btn red" data-a="x" data-i="'+i+'">✕</button>';
+  l.appendChild(d)
+ });
+ $('#ad').disabled=T.length>=8
+}
+function ra(){
+ $('#ag').innerHTML=T.map(t=>'<div class="ag"><h4>🎈 '+E(t)+'</h4><ul>'+((ANG[t]||[]).map((m,i)=>'<li>'+(i+1)+'. '+E(m)+'</li>').join('')||'<li>—</li>')+'</ul></div>').join('')
+}
+function cd(id){for(const k in B.M){const m=B.M[k];if([m.a,m.b].some(s=>s.f==id)&&Wn[k]){delete Wn[k];cd(k)}}}
+$('#b').onclick=e=>{const x=e.target.closest('.s.r');if(!x)return;const id=x.dataset.m,t=x.dataset.t;if(Wn[id]==t)delete Wn[id];else Wn[id]=t;cd(id);render()};
+$('#tl').onclick=e=>{const x=e.target.closest('button');if(!x)return;const i=+x.dataset.i;Wn={};
+ if(x.dataset.a=='u'&&i>0)[T[i-1],T[i]]=[T[i],T[i-1]];
+ if(x.dataset.a=='d'&&i<T.length-1)[T[i+1],T[i]]=[T[i],T[i+1]];
+ if(x.dataset.a=='x')T.splice(i,1);render()};
+$('#ad').onclick=()=>{const v=$('#ni').value.trim();if(!v||T.length>=8)return;T.push(v);$('#ni').value='';Wn={};render()};
+$('#sh').onclick=()=>{for(let i=T.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[T[i],T[j]]=[T[j],T[i]]}Wn={};render()};
+$('#re').onclick=()=>{Wn={};render()};
+$('#de').onclick=()=>{T=[...D];Wn={};render()};
+$('#g').onclick=()=>{$('#p').classList.toggle('open')};
+addEventListener('resize',dl);
+render();
+</script>
+</body>
+</html>
